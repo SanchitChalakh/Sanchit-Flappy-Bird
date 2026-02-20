@@ -17,7 +17,7 @@ let pipes = [];
 let gameRunning = false;
 
 const faceImg = new Image();
-faceImg.src = "assets/face.png";
+faceImg.src = "face.png";
 
 let bird = {
   x: 120,
