@@ -1,1 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sanchit Chalakh - Flappy Face</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<div id="startScreen" class="start-screen">
+  <div class="title-3d">
+    <h1>FLAPPY FACE</h1>
+    <h2>by Sanchit Chalakh</h2>
+  </div>
+
+  <div class="difficulty-container">
+    <div class="difficulty-card" onclick="setDifficulty('easy')">EASY</div>
+    <div class="difficulty-card" onclick="setDifficulty('medium')">MEDIUM</div>
+    <div class="difficulty-card" onclick="setDifficulty('hard')">HARD</div>
+  </div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script src="script.js"></script>
+</body>
+</html>
