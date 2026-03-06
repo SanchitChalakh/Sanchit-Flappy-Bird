@@ -1,153 +1,123 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sanchit Bhai Flappy Bird</title>
-
-<style>
-
-body{
-margin:0;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-font-family:Arial;
-overflow:hidden;
-
-background:linear-gradient(270deg,#00c6ff,#0072ff,#6dd5fa,#2980b9);
-background-size:800% 800%;
-animation:bgMove 15s ease infinite;
-}
-
-@keyframes bgMove{
-0%{background-position:0% 50%}
-50%{background-position:100% 50%}
-100%{background-position:0% 50%}
-}
-
-canvas{
-background:#87CEEB;
-border-radius:20px;
-box-shadow:0 20px 60px rgba(0,0,0,0.5);
-}
-
-/* PANEL */
-
-.panel{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-padding:45px;
-border-radius:25px;
-background:rgba(255,255,255,0.15);
-backdrop-filter:blur(15px);
-box-shadow:0 10px 40px rgba(0,0,0,0.3);
-text-align:center;
-color:white;
-}
-
-/* TITLE */
-
-.title{
-font-size:48px;
-letter-spacing:3px;
-margin:15px 0;
-animation:titleFloat 3s ease-in-out infinite;
-}
-
-@keyframes titleFloat{
-0%{transform:translateY(0)}
-50%{transform:translateY(-8px)}
-100%{transform:translateY(0)}
-}
-
-/* BUTTON */
-
-button{
-margin-top:20px;
-padding:16px 40px;
-font-size:20px;
-border:none;
-border-radius:40px;
-background:linear-gradient(45deg,#00ff9d,#00c853);
-color:white;
-cursor:pointer;
-transition:0.3s;
-}
-
-button:hover{
-transform:scale(1.1);
-}
-
-#gameOver{
-display:none;
-}
-
-</style>
-</head>
-
-<body>
-
-<canvas id="game" width="400" height="600"></canvas>
-
-<div id="startScreen" class="panel">
-
-<img src="face.png" width="70">
-
-<h3>Sanchit Chalakh</h3>
-
-<h1 class="title">FLAPPY BIRD</h1>
-
-<p>Best Score: <span id="bestScore">0</span></p>
-
-<button onclick="startGame()">▶ PLAY</button>
-
-</div>
-
-<div id="gameOver" class="panel">
-
-<h2>Game Over</h2>
-
-<p id="finalScore"></p>
-
-<p>Best Score: <span id="bestScore2">0</span></p>
-
-<button onclick="restartGame()">Restart</button>
-
-</div>
-
-<script>
-
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-
-let score = 0;
-let gameRunning = false;
-
-/* BEST SCORE */
-
-let bestScore = localStorage.getItem("bestScore") || 0;
-
-document.getElementById("bestScore").innerText = bestScore;
-document.getElementById("bestScore2").innerText = bestScore;
-
-/* BIRD */
-
-let birdImg = new Image();
-birdImg.src = "face.png";
-
-let bird = {
-x:80,
-y:200,
-width:50,
-height:50,
-gravity:0.5,
-lift:-8,
-velocity:0
-};
-
+<!DOCTYPE html>  <html>  
+<head>  
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">  
+<title>Flappy Bird - Next Level Ultra Premium</title>  <style>  
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',sans-serif;background:#87CEEB;transition:background 2s;}  
+canvas{display:block;background:transparent;border-radius:25px;box-shadow:0 20px 60px rgba(0,0,0,0.5);}  
+.panel{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:40px;border-radius:30px;background:rgba(255,255,255,0.2);backdrop-filter:blur(15px);box-shadow:0 10px 40px rgba(0,0,0,0.4);text-align:center;color:white;z-index:10;transition:all 0.3s;}  
+.panel h1{font-size:50px;letter-spacing:2px;}  
+.panel h3{font-size:22px;margin:5px;}  
+.panel button{margin-top:25px;padding:16px 40px;font-size:20px;border:none;border-radius:50px;background:linear-gradient(90deg,#00c853,#00e676);color:white;cursor:pointer;box-shadow:0 5px 20px rgba(0,0,0,0.4);transition:0.2s;}  
+.panel button:hover{transform:scale(1.05);}  
+.startImg,.modiImg{width:130px;border-radius:25px;margin:10px 0;box-shadow:0 15px 40px rgba(0,0,0,0.4);transition:0.3s;}  
+.startImg:hover,.modiImg:hover{transform:scale(1.05);}  
+.premiumText{font-size:32px;font-weight:bold;margin-top:20px;letter-spacing:2px;background:linear-gradient(90deg,#FFD700,#FFC107,#FFEA00,#FFD700);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3s linear infinite;}  
+@keyframes shine{0%{background-position:0%}100%{background-position:200%}}  
+.cloud{position:absolute;width:150px;height:80px;background:rgba(255,255,255,0.7);border-radius:50%;box-shadow:30px 10px 60px rgba(255,255,255,0.3);}  
+#gameOver{display:none;}  
+</style>  </head>  <body>  
+<canvas id="game"></canvas>  <div id="startScreen" class="panel">  
+<img src="face.png" class="startImg">  
+<h3>Sanchit Chalakh</h3>  
+<h1>FLAPPY BIRD</h1>  
+<p>Best Score: <span id="bestScore">0</span></p>  
+<button onclick="startGame()">PLAY</button>  
+</div>  <div id="gameOver" class="panel">  
+<h2>Game Over</h2>  
+<img src="Modi.jpg" class="modiImg">  
+<p id="finalScore" class="premiumText"></p>  
+<p>Best Score: <span id="bestScore2">0</span></p>  
+<button onclick="restartGame()">Restart</button>  
+</div>  <script>  
+const canvas=document.getElementById("game");  
+const ctx=canvas.getContext("2d");  
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}  
+window.addEventListener('resize',resizeCanvas);resizeCanvas();  
+  
+let score=0,gameRunning=false,bestScore=localStorage.getItem("bestScore")||0;  
+document.getElementById("bestScore").innerText=bestScore;  
+document.getElementById("bestScore2").innerText=bestScore;  
+  
+let jumpSound=new Audio("jump.mp3");  
+let scoreSound=new Audio("score.mp3");  
+let gameOverSound=new Audio("gameover.mp3");  
+let bgMusic=new Audio("bgMusic.mp3");bgMusic.loop=true;bgMusic.volume=0.3;  
+  
+let cycle=0;  
+let birdImg=new Image();birdImg.src="face.png";  
+let bird={x:canvas.width*0.2,y:canvas.height/2,width:60,height:60,gravity:0.55,lift:-10,velocity:0,rotation:0};  
+  
+let pipes=[];   
+let pipeSpeed=2.5;   
+let pipeGap=canvas.height*0.35;   
+const minPipeGap=canvas.height*0.2;   
+const maxPipeGap=canvas.height*0.45;  
+  
+let clouds=[];  
+for(let i=0;i<5;i++){clouds.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height*0.4,speed:0.2+Math.random()*0.5})}  
+  
+function createPipe(){let topHeight=Math.random()*canvas.height*0.45+50;let x=canvas.width;pipes.push({x:x,top:topHeight,bottom:topHeight+pipeGap,width:canvas.width*0.12,passed:false});}  
+  
+function drawBird(){  
+  bird.rotation=bird.velocity*0.05;  
+  ctx.save();  
+  ctx.translate(bird.x+bird.width/2,bird.y+bird.height/2);  
+  ctx.rotate(bird.rotation);  
+  ctx.drawImage(birdImg,-bird.width/2,-bird.height/2,bird.width,bird.height);  
+  ctx.restore();  
+}  
+  
+function updateBird(dt){bird.velocity+=bird.gravity*(dt/16);bird.y+=bird.velocity*(dt/16);if(bird.y+bird.height>=canvas.height){bird.y=canvas.height-bird.height;gameOver();}if(bird.y<=0){bird.y=0;bird.velocity=0;}}  
+  
+function drawPipes(dt){  
+  pipes.forEach(pipe=>{  
+    pipe.x-=pipeSpeed*(dt/16);  
+    let grad=ctx.createLinearGradient(pipe.x,0,pipe.x+pipe.width,0);  
+    grad.addColorStop(0,"#0B5345");grad.addColorStop(0.3,"#1E8449");grad.addColorStop(0.6,"#27AE60");grad.addColorStop(1,"#0B5345");  
+    ctx.fillStyle=grad;ctx.fillRect(pipe.x,0,pipe.width,pipe.top);ctx.fillRect(pipe.x,pipe.bottom,pipe.width,canvas.height);  
+    ctx.fillStyle="#1ABC9C";ctx.fillRect(pipe.x-10,pipe.top-20,pipe.width+20,20);ctx.fillRect(pipe.x-10,pipe.bottom,pipe.width+20,20);  
+  
+    if(!pipe.passed && pipe.x + pipe.width < bird.x){  
+      score++; pipe.passed=true; scoreSound.currentTime=0; scoreSound.play();  
+      if(score%5==0){pipeSpeed+=0.3;}  
+      if(score%10==0){pipeGap-=10;if(pipeGap<90) pipeGap=90;}  
+      createPipe(); // sequential next pipe  
+    }  
+  
+    if(bird.x<pipe.x+pipe.width && bird.x+bird.width>pipe.x && (bird.y<pipe.top || bird.y+bird.height>pipe.bottom)){gameOver();}  
+  });  
+  pipes=pipes.filter(p=>p.x+p.width>0);if(pipes.length===0) createPipe();  
+}  
+  
+function drawClouds(dt){clouds.forEach(c=>{c.x-=c.speed*(dt/16);if(c.x>canvas.width) c.x=-200;ctx.fillStyle="rgba(255,255,255,0.6)";ctx.beginPath();ctx.ellipse(c.x,c.y,80,40,0,0,2*Math.PI);ctx.fill();});}  
+  
+function drawScore(){if(score>bestScore){bestScore=score;localStorage.setItem("bestScore",bestScore);}  
+ctx.fillStyle="black";ctx.font=`${Math.floor(canvas.width*0.07)}px Arial`;ctx.fillText("Score: "+score,10,canvas.height*0.07);ctx.fillText("Best: "+bestScore,10,canvas.height*0.14);  
+if(score%10===0 && score>0){ctx.fillStyle="gold";ctx.font=`${Math.floor(canvas.width*0.1)}px Arial`;ctx.fillText("LEVEL UP!",canvas.width/2-100,canvas.height*0.3);}}   
+  
+function updateSky(){cycle+=0.002;let r=Math.floor(120+Math.sin(cycle)*80);let g=Math.floor(180+Math.sin(cycle)*50);let b=255;document.body.style.background=`rgb(${r},${g},${b})`;}  
+  
+function gameOver(){gameRunning=false;bird.velocity=0;document.getElementById("bestScore").innerText=bestScore;document.getElementById("bestScore2").innerText=bestScore;  
+document.getElementById("gameOver").style.display="block";document.getElementById("finalScore").innerText="Iska karan Modi hai";gameOverSound.currentTime=0;gameOverSound.play();bgMusic.pause();}  
+  
+function restartGame(){score=0;bird.y=canvas.height/2;bird.velocity=0;pipes=[];pipeSpeed=2.5;pipeGap=canvas.height*0.35;gameRunning=true;document.getElementById("gameOver").style.display="none";lastTime=null;bgMusic.currentTime=0;bgMusic.play();requestAnimationFrame(gameLoop);}  
+  
+function startGame(){document.getElementById("startScreen").style.display="none";gameRunning=true;bgMusic.currentTime=0;bgMusic.play();requestAnimationFrame(gameLoop);}  
+  
+canvas.addEventListener("touchstart",()=>{if(!gameRunning) return;bird.velocity=bird.lift;jumpSound.currentTime=0;jumpSound.play();});  
+  
+let lastTime=null;  
+function gameLoop(timestamp){  
+  if(!lastTime) lastTime=timestamp;const dt=timestamp-lastTime;lastTime=timestamp;  
+  ctx.clearRect(0,0,canvas.width,canvas.height);  
+  updateSky();  
+  drawClouds(dt);  
+  if(gameRunning){updateBird(dt); drawBird(); drawPipes(dt); drawScore();}  
+  requestAnimationFrame(gameLoop);  
+}  
+requestAnimationFrame(gameLoop);  
+</script>  </body>  
+</html>  add pause button option
 let pipes = [];
 
 let pipeInterval;
