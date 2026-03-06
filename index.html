@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sanchit Flappy Bird</title>
+<title>Flappy Bird</title>
 
 <style>
 
@@ -148,6 +148,225 @@ lift:-8,
 velocity:0
 };
 
+let pipes = [];
+
+let pipeInterval;
+
+function startPipeInterval(){
+pipeInterval = setInterval(createPipe,2000);
+}
+
+function stopPipeInterval(){
+clearInterval(pipeInterval);
+}
+
+function createPipe(){
+
+let gap = 200;
+let topHeight = Math.random()*300 + 50;
+
+pipes.push({
+x:canvas.width,
+top:topHeight,
+bottom:topHeight+gap,
+width:40,
+passed:false
+});
+
+}
+
+function drawBird(){
+
+ctx.drawImage(
+birdImg,
+bird.x,
+bird.y,
+bird.width,
+bird.height
+);
+
+}
+
+function updateBird(deltaTime){
+
+bird.velocity += bird.gravity*(deltaTime/16);
+bird.y += bird.velocity*(deltaTime/16);
+
+if(bird.y + bird.height >= canvas.height){
+
+bird.y = canvas.height - bird.height;
+gameOver();
+
+}
+
+if(bird.y <=0){
+
+bird.y = 0;
+bird.velocity = 0;
+
+}
+
+}
+
+function drawPipes(deltaTime){
+
+pipes.forEach(pipe=>{
+
+pipe.x -= 2*(deltaTime/16);
+
+/* 3D PIPE */
+
+let gradient = ctx.createLinearGradient(pipe.x,0,pipe.x+pipe.width,0);
+
+gradient.addColorStop(0,"#145A32");
+gradient.addColorStop(0.3,"#27ae60");
+gradient.addColorStop(0.6,"#2ecc71");
+gradient.addColorStop(1,"#145A32");
+
+ctx.fillStyle = gradient;
+
+ctx.fillRect(pipe.x,0,pipe.width,pipe.top);
+ctx.fillRect(pipe.x,pipe.bottom,pipe.width,canvas.height);
+
+/* MARIO CAP */
+
+ctx.fillStyle="#2ecc71";
+ctx.fillRect(pipe.x-10,pipe.top-20,pipe.width+20,20);
+ctx.fillRect(pipe.x-10,pipe.bottom,pipe.width+20,20);
+
+/* SCORE */
+
+if(pipe.x + pipe.width < bird.x && !pipe.passed){
+
+score++;
+pipe.passed=true;
+
+}
+
+if(
+bird.x < pipe.x + pipe.width &&
+bird.x + bird.width > pipe.x &&
+(bird.y < pipe.top || bird.y + bird.height > pipe.bottom)
+){
+
+gameOver();
+
+}
+
+});
+
+pipes = pipes.filter(pipe=>pipe.x + pipe.width >0);
+
+}
+
+function drawScore(){
+
+if(score > bestScore){
+
+bestScore = score;
+localStorage.setItem("bestScore", bestScore);
+
+}
+
+ctx.fillStyle="black";
+ctx.font="30px Arial";
+
+ctx.fillText("Score: "+score,10,40);
+ctx.fillText("Best: "+bestScore,10,80);
+
+}
+
+function gameOver(){
+
+gameRunning=false;
+
+stopPipeInterval();
+
+bird.velocity=0;
+
+document.getElementById("bestScore").innerText = bestScore;
+document.getElementById("bestScore2").innerText = bestScore;
+
+document.getElementById("gameOver").style.display="block";
+
+document.getElementById("finalScore").innerText="Score: "+score;
+
+}
+
+function restartGame(){
+
+score=0;
+bird.y=200;
+bird.velocity=0;
+pipes=[];
+
+gameRunning=true;
+
+document.getElementById("gameOver").style.display="none";
+
+lastTime=null;
+
+startPipeInterval();
+
+requestAnimationFrame(gameLoop);
+
+}
+
+function startGame(){
+
+document.getElementById("startScreen").style.display="none";
+
+gameRunning=true;
+
+startPipeInterval();
+
+requestAnimationFrame(gameLoop);
+
+}
+
+let jumpSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+
+canvas.addEventListener("touchstart",function(){
+
+if(!gameRunning) return;
+
+bird.velocity = bird.lift;
+
+jumpSound.play();
+
+});
+
+let lastTime=null;
+
+function gameLoop(timestamp){
+
+if(!lastTime) lastTime = timestamp;
+
+const deltaTime = timestamp-lastTime;
+
+lastTime = timestamp;
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+if(gameRunning){
+
+updateBird(deltaTime);
+drawBird();
+drawPipes(deltaTime);
+drawScore();
+
+}
+
+requestAnimationFrame(gameLoop);
+
+}
+
+requestAnimationFrame(gameLoop);
+
+</script>
+
+</body>
+</html>
 let pipes = [];
 
 let pipeInterval;
