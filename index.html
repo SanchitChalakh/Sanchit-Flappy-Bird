@@ -1,20 +1,208 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultra Flappy Bird</title>
-<link rel="stylesheet" href="style.css">
-</head><body><canvas id="game"></canvas>
+<title>Flappy Bird</title>
 
-<div id="startScreen" class="screen">
-<h1>Flappy Bird</h1>
-<button id="startBtn">Start Game</button>
-</div><div id="ui">
-<div id="score">0</div>
-<div id="best">Best:0</div>
-</div><div id="gameOver" class="screen">
-<h1>Game Over</h1>
+<style>
+
+body{
+margin:0;
+background:#70c5ce;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+font-family:Arial;
+}
+
+canvas{
+background:#87CEEB;
+border:4px solid black;
+}
+
+#gameOver{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:20px;
+display:none;
+text-align:center;
+border-radius:10px;
+}
+
+button{
+padding:10px 20px;
+font-size:18px;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="game" width="400" height="600"></canvas>
+
+<div id="gameOver">
+<h2>Game Over</h2>
 <p id="finalScore"></p>
-<button id="restartBtn">Restart</button>
-</div><script src="game.js"></script></body>
+<button onclick="restartGame()">Restart</button>
+</div>
+
+<script>
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let score = 0;
+let gameRunning = true;
+
+// 🖼️ Bird Image
+let birdImg = new Image();
+birdImg.src = "face.png";
+
+let bird = {
+x:80,
+y:200,
+width:40,
+height:40,
+gravity:0.5,
+lift:-8,
+velocity:0
+};
+
+let pipes = [];
+
+function createPipe(){
+
+let gap = 150;
+
+let topHeight = Math.random()*300+50;
+
+pipes.push({
+x:canvas.width,
+top:topHeight,
+bottom:topHeight+gap,
+width:60
+});
+
+}
+
+setInterval(createPipe,2000);
+
+function drawBird(){
+
+ctx.drawImage(birdImg,bird.x,bird.y,bird.width,bird.height);
+
+}
+
+function updateBird(){
+
+bird.velocity += bird.gravity;
+bird.y += bird.velocity;
+
+}
+
+function drawPipes(){
+
+ctx.fillStyle="green";
+
+pipes.forEach(pipe=>{
+
+ctx.fillRect(pipe.x,0,pipe.width,pipe.top);
+ctx.fillRect(pipe.x,pipe.bottom,pipe.width,canvas.height);
+
+pipe.x -= 2;
+
+if(pipe.x + pipe.width < bird.x && !pipe.passed){
+
+score++;
+pipe.passed=true;
+
+}
+
+if(
+bird.x < pipe.x + pipe.width &&
+bird.x + bird.width > pipe.x &&
+(bird.y < pipe.top || bird.y + bird.height > pipe.bottom)
+){
+
+gameOver();
+
+}
+
+});
+
+pipes = pipes.filter(pipe => pipe.x + pipe.width > 0);
+
+}
+
+function drawScore(){
+
+ctx.fillStyle="black";
+ctx.font="30px Arial";
+ctx.fillText("Score: "+score,10,40);
+
+}
+
+function gameOver(){
+
+gameRunning=false;
+
+document.getElementById("gameOver").style.display="block";
+document.getElementById("finalScore").innerText="Score: "+score;
+
+}
+
+function restartGame(){
+
+score = 0;
+bird.y = 200;
+bird.velocity = 0;
+pipes = [];
+gameRunning = true;
+
+document.getElementById("gameOver").style.display="none";
+
+gameLoop();
+
+}
+
+// 📱 Mobile Touch Jump
+canvas.addEventListener("touchstart",function(e){
+
+if(!gameRunning) return;
+
+bird.velocity = bird.lift;
+jumpSound.play();
+
+});
+
+// 🔊 Jump Sound
+let jumpSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+
+function gameLoop(){
+
+if(!gameRunning) return;
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+updateBird();
+drawBird();
+
+drawPipes();
+
+drawScore();
+
+requestAnimationFrame(gameLoop);
+
+}
+
+gameLoop();
+
+</script>
+
+</body>
 </html>
