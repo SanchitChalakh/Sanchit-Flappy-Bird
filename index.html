@@ -75,36 +75,55 @@ velocity:0
 
 let pipes = [];
 
+// Create Pipes
 function createPipe(){
 
 let gap = 150;
-
 let topHeight = Math.random()*300+50;
 
 pipes.push({
 x:canvas.width,
 top:topHeight,
 bottom:topHeight+gap,
-width:60
+width:60,
+passed:false
 });
 
 }
 
 setInterval(createPipe,2000);
 
+// Draw Bird
 function drawBird(){
 
 ctx.drawImage(birdImg,bird.x,bird.y,bird.width,bird.height);
 
 }
 
+// Update Bird
 function updateBird(){
 
 bird.velocity += bird.gravity;
 bird.y += bird.velocity;
 
+// Ground collision
+if(bird.y + bird.height >= canvas.height){
+
+gameOver();
+
 }
 
+// Top limit
+if(bird.y <= 0){
+
+bird.y = 0;
+bird.velocity = 0;
+
+}
+
+}
+
+// Draw Pipes
 function drawPipes(){
 
 ctx.fillStyle="green";
@@ -116,6 +135,7 @@ ctx.fillRect(pipe.x,pipe.bottom,pipe.width,canvas.height);
 
 pipe.x -= 2;
 
+// Score
 if(pipe.x + pipe.width < bird.x && !pipe.passed){
 
 score++;
@@ -123,6 +143,7 @@ pipe.passed=true;
 
 }
 
+// Collision with pipes
 if(
 bird.x < pipe.x + pipe.width &&
 bird.x + bird.width > pipe.x &&
@@ -139,6 +160,7 @@ pipes = pipes.filter(pipe => pipe.x + pipe.width > 0);
 
 }
 
+// Draw Score
 function drawScore(){
 
 ctx.fillStyle="black";
@@ -147,6 +169,7 @@ ctx.fillText("Score: "+score,10,40);
 
 }
 
+// Game Over
 function gameOver(){
 
 gameRunning=false;
@@ -156,6 +179,7 @@ document.getElementById("finalScore").innerText="Score: "+score;
 
 }
 
+// Restart Game
 function restartGame(){
 
 score = 0;
@@ -170,8 +194,11 @@ gameLoop();
 
 }
 
-// 📱 Mobile Touch Jump
-canvas.addEventListener("touchstart",function(e){
+// Jump Sound
+let jumpSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+
+// Mobile Touch Control
+canvas.addEventListener("touchstart",function(){
 
 if(!gameRunning) return;
 
@@ -180,9 +207,7 @@ jumpSound.play();
 
 });
 
-// 🔊 Jump Sound
-let jumpSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
-
+// Game Loop
 function gameLoop(){
 
 if(!gameRunning) return;
@@ -193,7 +218,6 @@ updateBird();
 drawBird();
 
 drawPipes();
-
 drawScore();
 
 requestAnimationFrame(gameLoop);
