@@ -1,153 +1,273 @@
-<!DOCTYPE html>  <html>  
-<head>  
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">  
-<title>Flappy Bird - Next Level Ultra Premium</title>  <style>  
-html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',sans-serif;background:#87CEEB;transition:background 2s;}  
-canvas{display:block;background:transparent;border-radius:25px;box-shadow:0 20px 60px rgba(0,0,0,0.5);}  
-.panel{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:40px;border-radius:30px;background:rgba(255,255,255,0.2);backdrop-filter:blur(15px);box-shadow:0 10px 40px rgba(0,0,0,0.4);text-align:center;color:white;z-index:10;transition:all 0.3s;}  
-.panel h1{font-size:50px;letter-spacing:2px;}  
-.panel h3{font-size:22px;margin:5px;}  
-.panel button{margin-top:25px;padding:16px 40px;font-size:20px;border:none;border-radius:50px;background:linear-gradient(90deg,#00c853,#00e676);color:white;cursor:pointer;box-shadow:0 5px 20px rgba(0,0,0,0.4);transition:0.2s;}  
-.panel button:hover{transform:scale(1.05);}  
-.startImg,.modiImg{width:130px;border-radius:25px;margin:10px 0;box-shadow:0 15px 40px rgba(0,0,0,0.4);transition:0.3s;}  
-.startImg:hover,.modiImg:hover{transform:scale(1.05);}  
-.premiumText{font-size:32px;font-weight:bold;margin-top:20px;letter-spacing:2px;background:linear-gradient(90deg,#FFD700,#FFC107,#FFEA00,#FFD700);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3s linear infinite;}  
-@keyframes shine{0%{background-position:0%}100%{background-position:200%}}  
-.cloud{position:absolute;width:150px;height:80px;background:rgba(255,255,255,0.7);border-radius:50%;box-shadow:30px 10px 60px rgba(255,255,255,0.3);}  
-#gameOver{display:none;}  
-</style>  </head>  <body>  
-<canvas id="game"></canvas>  <div id="startScreen" class="panel">  
-<img src="face.png" class="startImg">  
-<h3>Sanchit Chalakh</h3>  
-<h1>FLAPPY BIRD</h1>  
-<p>Best Score: <span id="bestScore">0</span></p>  
-<button onclick="startGame()">PLAY</button>  
-</div>  <div id="gameOver" class="panel">  
-<h2>Game Over</h2>  
-<img src="Modi.jpg" class="modiImg">  
-<p id="finalScore" class="premiumText"></p>  
-<p>Best Score: <span id="bestScore2">0</span></p>  
-<button onclick="restartGame()">Restart</button>  
-</div>  <script>  
-const canvas=document.getElementById("game");  
-const ctx=canvas.getContext("2d");  
-function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}  
-window.addEventListener('resize',resizeCanvas);resizeCanvas();  
-  
-let score=0,gameRunning=false,bestScore=localStorage.getItem("bestScore")||0;  
-document.getElementById("bestScore").innerText=bestScore;  
-document.getElementById("bestScore2").innerText=bestScore;  
-  
-let jumpSound=new Audio("jump.mp3");  
-let scoreSound=new Audio("score.mp3");  
-let gameOverSound=new Audio("gameover.mp3");  
-let bgMusic=new Audio("bgMusic.mp3");bgMusic.loop=true;bgMusic.volume=0.3;  
-  
-let cycle=0;  
-let birdImg=new Image();birdImg.src="face.png";  
-let bird={x:canvas.width*0.2,y:canvas.height/2,width:60,height:60,gravity:0.55,lift:-10,velocity:0,rotation:0};  
-  
-let pipes=[];   
-let pipeSpeed=2.5;   
-let pipeGap=canvas.height*0.35;   
-const minPipeGap=canvas.height*0.2;   
-const maxPipeGap=canvas.height*0.45;  
-  
-let clouds=[];  
-for(let i=0;i<5;i++){clouds.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height*0.4,speed:0.2+Math.random()*0.5})}  
-  
-function createPipe(){let topHeight=Math.random()*canvas.height*0.45+50;let x=canvas.width;pipes.push({x:x,top:topHeight,bottom:topHeight+pipeGap,width:canvas.width*0.12,passed:false});}  
-  
-function drawBird(){  
-  bird.rotation=bird.velocity*0.05;  
-  ctx.save();  
-  ctx.translate(bird.x+bird.width/2,bird.y+bird.height/2);  
-  ctx.rotate(bird.rotation);  
-  ctx.drawImage(birdImg,-bird.width/2,-bird.height/2,bird.width,bird.height);  
-  ctx.restore();  
-}  
-  
-function updateBird(dt){bird.velocity+=bird.gravity*(dt/16);bird.y+=bird.velocity*(dt/16);if(bird.y+bird.height>=canvas.height){bird.y=canvas.height-bird.height;gameOver();}if(bird.y<=0){bird.y=0;bird.velocity=0;}}  
-  
-function drawPipes(dt){  
-  pipes.forEach(pipe=>{  
-    pipe.x-=pipeSpeed*(dt/16);  
-    let grad=ctx.createLinearGradient(pipe.x,0,pipe.x+pipe.width,0);  
-    grad.addColorStop(0,"#0B5345");grad.addColorStop(0.3,"#1E8449");grad.addColorStop(0.6,"#27AE60");grad.addColorStop(1,"#0B5345");  
-    ctx.fillStyle=grad;ctx.fillRect(pipe.x,0,pipe.width,pipe.top);ctx.fillRect(pipe.x,pipe.bottom,pipe.width,canvas.height);  
-    ctx.fillStyle="#1ABC9C";ctx.fillRect(pipe.x-10,pipe.top-20,pipe.width+20,20);ctx.fillRect(pipe.x-10,pipe.bottom,pipe.width+20,20);  
-  
-    if(!pipe.passed && pipe.x + pipe.width < bird.x){  
-      score++; pipe.passed=true; scoreSound.currentTime=0; scoreSound.play();  
-      if(score%5==0){pipeSpeed+=0.3;}  
-      if(score%10==0){pipeGap-=10;if(pipeGap<90) pipeGap=90;}  
-      createPipe(); // sequential next pipe  
-    }  
-  
-    if(bird.x<pipe.x+pipe.width && bird.x+bird.width>pipe.x && (bird.y<pipe.top || bird.y+bird.height>pipe.bottom)){gameOver();}  
-  });  
-  pipes=pipes.filter(p=>p.x+p.width>0);if(pipes.length===0) createPipe();  
-}  
-  
-function drawClouds(dt){clouds.forEach(c=>{c.x-=c.speed*(dt/16);if(c.x>canvas.width) c.x=-200;ctx.fillStyle="rgba(255,255,255,0.6)";ctx.beginPath();ctx.ellipse(c.x,c.y,80,40,0,0,2*Math.PI);ctx.fill();});}  
-  
-function drawScore(){if(score>bestScore){bestScore=score;localStorage.setItem("bestScore",bestScore);}  
-ctx.fillStyle="black";ctx.font=`${Math.floor(canvas.width*0.07)}px Arial`;ctx.fillText("Score: "+score,10,canvas.height*0.07);ctx.fillText("Best: "+bestScore,10,canvas.height*0.14);  
-if(score%10===0 && score>0){ctx.fillStyle="gold";ctx.font=`${Math.floor(canvas.width*0.1)}px Arial`;ctx.fillText("LEVEL UP!",canvas.width/2-100,canvas.height*0.3);}}   
-  
-function updateSky(){cycle+=0.002;let r=Math.floor(120+Math.sin(cycle)*80);let g=Math.floor(180+Math.sin(cycle)*50);let b=255;document.body.style.background=`rgb(${r},${g},${b})`;}  
-  
-function gameOver(){gameRunning=false;bird.velocity=0;document.getElementById("bestScore").innerText=bestScore;document.getElementById("bestScore2").innerText=bestScore;  
-document.getElementById("gameOver").style.display="block";document.getElementById("finalScore").innerText="Iska karan Modi hai";gameOverSound.currentTime=0;gameOverSound.play();bgMusic.pause();}  
-  
-function restartGame(){score=0;bird.y=canvas.height/2;bird.velocity=0;pipes=[];pipeSpeed=2.5;pipeGap=canvas.height*0.35;gameRunning=true;document.getElementById("gameOver").style.display="none";lastTime=null;bgMusic.currentTime=0;bgMusic.play();requestAnimationFrame(gameLoop);}  
-  
-function startGame(){document.getElementById("startScreen").style.display="none";gameRunning=true;bgMusic.currentTime=0;bgMusic.play();requestAnimationFrame(gameLoop);}  
-  
-canvas.addEventListener("touchstart",()=>{if(!gameRunning) return;bird.velocity=bird.lift;jumpSound.currentTime=0;jumpSound.play();});  
-  
-let lastTime=null;  
-function gameLoop(timestamp){  
-  if(!lastTime) lastTime=timestamp;const dt=timestamp-lastTime;lastTime=timestamp;  
-  ctx.clearRect(0,0,canvas.width,canvas.height);  
-  updateSky();  
-  drawClouds(dt);  
-  if(gameRunning){updateBird(dt); drawBird(); drawPipes(dt); drawScore();}  
-  requestAnimationFrame(gameLoop);  
-}  
-requestAnimationFrame(gameLoop);  
-</script>  </body>  
-</html>  add pause button option
-let pipes = [];
-
-let pipeInterval;
-
-function startPipeInterval(){
-pipeInterval = setInterval(createPipe,2000);
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flappy Bird - Ultra Premium</title>
+<style>
+html, body {
+    margin:0; padding:0; width:100%; height:100%;
+    overflow:hidden; font-family:'Segoe UI',sans-serif;
+    background:#87CEEB; transition: background 2s;
+}
+canvas {
+    display:block; background:transparent; border-radius:25px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
 }
 
-function stopPipeInterval(){
-clearInterval(pipeInterval);
+/* Panels */
+.panel {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    padding:30px 20px; border-radius:30px; background:rgba(0,0,0,0.5);
+    text-align:center; color:white; z-index:10; max-width:400px; width:90%;
+    overflow:hidden;
+}
+.panel h1, .panel h2 { font-size:50px; letter-spacing:2px; margin-bottom:20px; }
+.panel h3 { font-size:22px; margin:5px; }
+
+/* Face Selector */
+#faceSelector {
+    display:flex; align-items:center; justify-content:center; margin:20px 0;
+}
+#faceSelector button {
+    font-size:30px; background:rgba(255,255,255,0.3); border:none; border-radius:15px;
+    padding:5px 15px; cursor:pointer; color:black; margin:0 10px;
+    transition:0.2s;
+}
+#faceSelector button:hover { background:rgba(255,255,255,0.5); }
+#selectedFace {
+    width:100px; height:100px; border-radius:20px; box-shadow:0 8px 20px rgba(0,0,0,0.4);
 }
 
-function createPipe(){
+/* Premium Game Over Text */
+.premiumText {
+    font-weight:bold; margin-top:20px; letter-spacing:2px;
+    background:linear-gradient(90deg,#FF0000,#FF8C00,#FFD700,#FF0000);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    animation:shine 3s linear infinite; text-align:center; line-height:1.3;
+}
+@keyframes shine {0%{background-position:0%}100%{background-position:200%}}
+#yourScore { font-size:24px; margin:10px 0; color:white; }
 
-let gap = 200;
-let topHeight = Math.random()*300 + 50;
+/* Buttons */
+.panel button.startBtn, .panel button.restartBtn {
+    width:100%; max-width:250px; padding:12px 0; font-size:20px;
+    border:none; border-radius:50px; background:linear-gradient(90deg,#00c853,#00e676);
+    color:white; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.3);
+    display:block; margin:20px auto 0 auto; transition:0.2s;
+}
+.panel button.startBtn:hover, .panel button.restartBtn:hover { transform:scale(1.05); }
 
-pipes.push({
-x:canvas.width,
-top:topHeight,
-bottom:topHeight+gap,
-width:40,
-passed:false
-});
+/* Pause */
+#pauseBtn { position:absolute; top:20px; right:20px; padding:10px 20px; font-size:18px;
+    border:none; border-radius:20px; background:rgba(255,255,255,0.3); color:white;
+    cursor:pointer; backdrop-filter:blur(5px); z-index:15; }
+#pauseBtn:hover {background:rgba(255,255,255,0.5);}
+#pauseOverlay {
+    display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    z-index:20; padding:40px; border-radius:30px; background:rgba(0,0,0,0.5);
+    text-align:center; color:white;
+}
+#pauseOverlay h1 { font-size:60px; margin-bottom:30px; letter-spacing:3px; }
+#pauseOverlay button { padding:15px 50px; font-size:22px; border-radius:50px; border:none; background:linear-gradient(90deg,#00c853,#00e676); cursor:pointer; }
+#pauseOverlay button:hover { transform:scale(1.05); }
 
+/* Clouds */
+.cloud { position:absolute; width:150px; height:80px; background:rgba(255,255,255,0.7); border-radius:50%; box-shadow:30px 10px 60px rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<!-- Start Screen -->
+<div id="startScreen" class="panel">
+  <h3>Sanchit Chalakh</h3>
+  <h1>FLAPPY BIRD</h1>
+  <p>Select your bird face:</p>
+
+  <!-- Face Selector with arrows -->
+  <div id="faceSelector">
+    <button onclick="changeFace(-1)">◀</button>
+    <img id="selectedFace" src="face1.png">
+    <button onclick="changeFace(1)">▶</button>
+  </div>
+
+  <p>Best Score: <span id="bestScore">0</span></p>
+  <button class="startBtn" onclick="startGame()">PLAY</button>
+</div>
+
+<!-- Game Over -->
+<div id="gameOver" class="panel" style="display:none;">
+  <h2>Game Over</h2>
+  <img src="Modi.jpg" class="modiImg" style="width:130px; border-radius:25px; margin:10px 5px;">
+  <p class="premiumText">TENSION MAT LE <br>ISKA KARAN MODI HAI</p>
+  <p id="yourScore"></p>
+  <p>Best Score: <span id="bestScore2">0</span></p>
+  <button class="restartBtn" onclick="restartGame()">Restart</button>
+</div>
+
+<!-- Pause Overlay -->
+<button id="pauseBtn" onclick="togglePause()" style="display:none;">Pause</button>
+<div id="pauseOverlay">
+  <h1>PAUSED</h1>
+  <button onclick="togglePause()">Resume</button>
+</div>
+
+<script>
+// Canvas setup
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+// Game variables
+let score = 0, gameRunning = false, paused = false;
+let bestScore = localStorage.getItem("bestScore")||0;
+document.getElementById("bestScore").innerText = bestScore;
+document.getElementById("bestScore2").innerText = bestScore;
+
+// Sounds
+let jumpSound = new Audio("jump.mp3");
+let scoreSound = new Audio("score.mp3");
+let gameOverSound = new Audio("gameover.mp3");
+let bgMusic = new Audio("bgMusic.mp3"); bgMusic.loop = true; bgMusic.volume = 0.3;
+
+// Bird
+let birdImg = new Image(); birdImg.src = "face1.png";
+let bird = {x:canvas.width*0.2, y:canvas.height/2, width:60, height:60, gravity:0.4, lift:-8, velocity:0, rotation:0};
+
+// Pipes
+let pipes = [], pipeSpeed = 2.5, pipeGap = canvas.height*0.35;
+
+// Clouds
+let clouds = []; 
+for(let i=0;i<5;i++){ clouds.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height*0.4, speed:0.2+Math.random()*0.5}) }
+
+// Pipe gradients
+const pipeColors = [["#145A32","#27ae60","#2ecc71","#145A32"],["#8e44ad","#9b59b6","#d2b4de","#8e44ad"],["#e67e22","#f39c12","#f1c40f","#e67e22"]];
+function getPipeGradient(pipe){
+    let colorIndex = Math.floor(score/20)%pipeColors.length;
+    let colors = pipeColors[colorIndex];
+    let grad = ctx.createLinearGradient(pipe.x,0,pipe.x+pipe.width,0);
+    grad.addColorStop(0, colors[0]);
+    grad.addColorStop(0.3, colors[1]);
+    grad.addColorStop(0.6, colors[2]);
+    grad.addColorStop(1, colors[3]);
+    return grad;
 }
 
-function drawBird(){
+// Face selection carousel
+const faces = ["face1.png","face2.png"];
+let currentFaceIndex = 0;
+const selectedFace = document.getElementById("selectedFace");
+function changeFace(direction){
+    currentFaceIndex += direction;
+    if(currentFaceIndex < 0) currentFaceIndex = faces.length-1;
+    if(currentFaceIndex >= faces.length) currentFaceIndex = 0;
+    selectedFace.src = faces[currentFaceIndex];
+    birdImg.src = faces[currentFaceIndex];
+}
 
-ctx.drawImage(
+// Create Pipe
+function createPipe(){ 
+    let topHeight = Math.random()*canvas.height*0.45+50;
+    pipes.push({x:canvas.width, top:topHeight, bottom:topHeight+pipeGap, width:canvas.width*0.12, passed:false});
+}
+
+// Draw & update
+function drawBird(){ 
+    ctx.save(); 
+    ctx.translate(bird.x+bird.width/2,bird.y+bird.height/2); 
+    ctx.rotate(bird.velocity*0.05); 
+    ctx.drawImage(birdImg,-bird.width/2,-bird.height/2,bird.width,bird.height); 
+    ctx.restore(); 
+}
+
+function updateBird(dt){ 
+    if(!paused){ 
+        bird.velocity += bird.gravity*(dt/16); 
+        bird.y += bird.velocity*(dt/16); 
+        if(bird.y+bird.height >= canvas.height){bird.y = canvas.height-bird.height; gameOver();}
+        if(bird.y <=0){bird.y=0;bird.velocity=0;} 
+    } 
+}
+
+function drawPipes(dt){
+    pipes.forEach(pipe=>{
+        if(!paused) pipe.x -= pipeSpeed*(dt/16);
+        ctx.fillStyle = getPipeGradient(pipe);
+        ctx.fillRect(pipe.x,0,pipe.width,pipe.top);
+        ctx.fillRect(pipe.x,pipe.bottom,pipe.width,canvas.height);
+
+        // Pipe caps
+        ctx.fillStyle = "#2ecc71";
+        ctx.fillRect(pipe.x-10, pipe.top-20, pipe.width+20, 20); // Top
+        ctx.fillRect(pipe.x-10, pipe.bottom, pipe.width+20, 20);   // Bottom
+
+        // Score
+        if(!pipe.passed && pipe.x + pipe.width < bird.x && !paused){ 
+            score++; pipe.passed = true; scoreSound.currentTime = 0; scoreSound.play();
+            if(score % 5 == 0) pipeSpeed += 0.3;
+            if(score % 10 == 0){ pipeGap -= 10; if(pipeGap < 90) pipeGap = 90; }
+            createPipe();
+        }
+
+        // Collision
+        if(bird.x < pipe.x + pipe.width && bird.x + bird.width > pipe.x &&
+           (bird.y < pipe.top || bird.y + bird.height > pipe.bottom)) gameOver();
+    });
+    pipes = pipes.filter(p => p.x + p.width > 0);
+    if(pipes.length === 0) createPipe();
+}
+
+function drawClouds(dt){ clouds.forEach(c=>{ c.x -= c.speed*(dt/16); if(c.x<-200) c.x=canvas.width; ctx.fillStyle="rgba(255,255,255,0.6)"; ctx.beginPath(); ctx.ellipse(c.x,c.y,80,40,0,0,2*Math.PI); ctx.fill(); }); }
+function drawScore(){ if(score>bestScore){bestScore=score; localStorage.setItem("bestScore",bestScore);} ctx.fillStyle="black"; ctx.font=`${Math.floor(canvas.width*0.07)}px Arial`; ctx.fillText("Score: "+score,10,canvas.height*0.07); ctx.fillText("Best: "+bestScore,10,canvas.height*0.14); }
+function updateSky(){ let cycle=Date.now()*0.002; let r=Math.floor(120+Math.sin(cycle)*80); let g=Math.floor(180+Math.sin(cycle)*50); let b=255; document.body.style.background=`rgb(${r},${g},${b})`; }
+
+// Game over
+function gameOver(){
+    gameRunning=false; paused=false;
+    document.getElementById("bestScore").innerText=bestScore;
+    document.getElementById("bestScore2").innerText=bestScore;
+    document.getElementById("gameOver").style.display="block";
+    document.getElementById("yourScore").innerText="Your Score: "+score;
+    gameOverSound.currentTime=0; gameOverSound.play();
+    bgMusic.pause();
+}
+
+// Start & restart
+function restartGame(){ score=0; bird.y=canvas.height/2; bird.velocity=0; pipes=[]; pipeSpeed=2.5; pipeGap=canvas.height*0.35; gameRunning=true; paused=false; document.getElementById("gameOver").style.display="none"; lastTime=null; requestAnimationFrame(gameLoop); }
+function startGame(){ document.getElementById("startScreen").style.display="none"; gameRunning=true; paused=false; lastTime=null; requestAnimationFrame(gameLoop); bgMusic.play(); }
+
+// Pause
+const pauseBtn = document.getElementById("pauseBtn"); 
+const pauseOverlay = document.getElementById("pauseOverlay");
+function togglePause(){ 
+    if(!gameRunning) return; 
+    paused = !paused; 
+    if(paused){ bgMusic.pause(); pauseOverlay.style.display="block"; pauseBtn.style.display="none"; } 
+    else { bgMusic.play(); pauseOverlay.style.display="none"; pauseBtn.style.display="block"; } 
+}
+
+// Touch controls
+canvas.addEventListener("touchstart",()=>{ if(!gameRunning||paused) return; bird.velocity=bird.lift; jumpSound.currentTime=0; jumpSound.play(); });
+
+// Game loop
+let lastTime = null;
+function gameLoop(timestamp){
+    if(!lastTime) lastTime=timestamp;
+    const dt = timestamp-lastTime; lastTime=timestamp;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    updateSky(); drawClouds(dt);
+    if(gameRunning){
+        pauseBtn.style.display="block";
+        drawBird(); drawPipes(dt); drawScore(); if(!paused) updateBird(dt);
+    } else { pauseBtn.style.display="none"; }
+    requestAnimationFrame(gameLoop);
+}
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>ctx.drawImage(
 birdImg,
 bird.x,
 bird.y,
