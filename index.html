@@ -1,78 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flappy Bird - Ultra Premium</title>
 <style>
 html, body {
-    margin:0; padding:0; width:100%; height:100%;
-    overflow:hidden; font-family:'Segoe UI',sans-serif;
-    background:#87CEEB; transition: background 2s;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', sans-serif;
+    background: #87CEEB;
+    transition: background 2s;
 }
+
 canvas {
-    display:block; background:transparent; border-radius:25px;
-    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    display: block;
+    background: transparent;
+    border-radius: 25px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
+
 /* Panels */
 .panel {
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    padding:30px 20px; border-radius:30px; background:rgba(0,0,0,0.5);
-    text-align:center; color:white; z-index:10; max-width:400px; width:90%;
-    overflow:hidden;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    padding: 30px 20px;
+    border-radius: 30px;
+    background: rgba(0,0,0,0.5);
+    text-align: center;
+    color: white;
+    z-index: 10;
+    max-width: 400px;
+    width: 90%;
+    overflow: hidden;
 }
-.panel h1, .panel h2 { font-size:50px; letter-spacing:2px; margin-bottom:20px; }
-.panel h3 { font-size:22px; margin:5px; }
+.panel h1, .panel h2 {
+    font-size: 50px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+.panel h3 {
+    font-size: 22px;
+    margin: 5px;
+}
+
 /* Face Selector */
 #faceSelector {
-    display:flex; align-items:center; justify-content:center; margin:20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
 }
 #faceSelector button {
-    font-size:30px; background:rgba(255,255,255,0.3); border:none; border-radius:15px;
-    padding:5px 15px; cursor:pointer; color:black; margin:0 10px;
-    transition:0.2s;
+    font-size: 30px;
+    background: rgba(255,255,255,0.3);
+    border: none;
+    border-radius: 15px;
+    padding: 5px 15px;
+    cursor: pointer;
+    color: black;
+    margin: 0 10px;
+    transition: 0.2s;
 }
-#faceSelector button:hover { background:rgba(255,255,255,0.5); }
+#faceSelector button:hover {
+    background: rgba(255,255,255,0.5);
+}
 #selectedFace {
-    width:100px; height:100px; border-radius:20px; box-shadow:0 8px 20px rgba(0,0,0,0.4);
+    width: 100px;
+    height: 100px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
 }
+
 /* Premium Game Over Text */
 .premiumText {
-    font-weight:bold; margin-top:20px; letter-spacing:2px;
-    background:linear-gradient(90deg,#FF0000,#FF8C00,#FFD700,#FF0000);
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    animation:shine 3s linear infinite; text-align:center; line-height:1.3;
+    font-weight: bold;
+    margin-top: 20px;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #FF0000,#FF8C00,#FFD700,#FF0000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s linear infinite;
+    text-align: center;
+    line-height: 1.3;
 }
-@keyframes shine {0%{background-position:0%}100%{background-position:200%}}
-#yourScore { font-size:24px; margin:10px 0; color:white; }
+@keyframes shine {
+    0% {background-position: 0%}
+    100% {background-position: 200%}
+}
+#yourScore {
+    font-size: 24px;
+    margin: 10px 0;
+    color: white;
+}
+
 /* Buttons */
 .panel button.startBtn, .panel button.restartBtn {
-    width:100%; max-width:250px; padding:12px 0; font-size:20px;
-    border:none; border-radius:50px; background:linear-gradient(90deg,#00c853,#00e676);
-    color:white; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.3);
-    display:block; margin:20px auto 0 auto; transition:0.2s;
+    width: 100%;
+    max-width: 250px;
+    padding: 12px 0;
+    font-size: 20px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(90deg, #00c853, #00e676);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: block;
+    margin: 20px auto 0 auto;
+    transition: 0.2s;
 }
-.panel button.startBtn:hover, .panel button.restartBtn:hover { transform:scale(1.05); }
+.panel button.startBtn:hover, .panel button.restartBtn:hover {
+    transform: scale(1.05);
+}
+
 /* Pause */
 #pauseBtn {
-    position:absolute; top:20px; right:20px; padding:10px 20px; font-size:18px;
-    border:none; border-radius:20px; background:rgba(255,255,255,0.3); color:white;
-    cursor:pointer; backdrop-filter:blur(5px); z-index:15;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.3);
+    color: white;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    z-index: 15;
 }
-#pauseBtn:hover {background:rgba(255,255,255,0.5);}
+#pauseBtn:hover {
+    background: rgba(255,255,255,0.5);
+}
 #pauseOverlay {
-    display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    z-index:20; padding:40px; border-radius:30px; background:rgba(0,0,0,0.5);
-    text-align:center; color:white;
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 20;
+    padding: 40px;
+    border-radius: 30px;
+    background: rgba(0,0,0,0.5);
+    text-align: center;
+    color: white;
 }
-#pauseOverlay h1 { font-size:60px; margin-bottom:30px; letter-spacing:3px; }
+#pauseOverlay h1 {
+    font-size: 60px;
+    margin-bottom: 30px;
+    letter-spacing: 3px;
+}
 #pauseOverlay button {
-    padding:15px 50px; font-size:22px; border-radius:50px; border:none;
-    background:linear-gradient(90deg,#00c853,#00e676); cursor:pointer;
+    padding: 15px 50px;
+    font-size: 22px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(90deg,#00c853,#00e676);
+    cursor: pointer;
 }
-#pauseOverlay button:hover { transform:scale(1.05); }
+#pauseOverlay button:hover {
+    transform: scale(1.05);
+}
+
 /* Clouds */
-.cloud { position:absolute; width:150px; height:80px; background:rgba(255,255,255,0.7); border-radius:50%; box-shadow:30px 10px 60px rgba(255,255,255,0.3); }
+.cloud {
+    position: absolute;
+    width: 150px;
+    height: 80px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 50%;
+    box-shadow: 30px 10px 60px rgba(255,255,255,0.3);
+}
 </style>
 </head>
 <body>
@@ -80,41 +182,48 @@ canvas {
 
 <!-- Start Screen -->
 <div id="startScreen" class="panel">
-<h3>Sanchit Chalakh</h3>
-<h1>FLAPPY BIRD</h1>
-<p>Select your bird face:</p>
-<div id="faceSelector">
-<button onclick="changeFace(-1)">◀</button>
-<img id="selectedFace" src="face1.png" alt="Bird Face">
-<button onclick="changeFace(1)">▶</button>
-</div>
-<p>Best Score: <span id="bestScore">0</span></p>
-<button class="startBtn" onclick="startGame()">PLAY</button>
+    <h3>Sanchit Chalakh</h3>
+    <h1>FLAPPY BIRD</h1>
+    <p>Select your bird face:</p>
+
+    <div id="faceSelector">
+        <button onclick="changeFace(-1)">◀</button>
+        <img id="selectedFace" src="face1.png">
+        <button onclick="changeFace(1)">▶</button>
+    </div>
+
+    <p>Best Score: <span id="bestScore">0</span></p>
+    <button class="startBtn" onclick="startGame()">PLAY</button>
 </div>
 
 <!-- Game Over -->
 <div id="gameOver" class="panel" style="display:none;">
-<h2>Game Over</h2>
-<img src="Modi.jpg" class="modiImg" style="width:130px; border-radius:25px; margin:10px 5px;">
-<p class="premiumText">TENSION MAT LE <br>ISKA KARAN MODI HAI</p>
-<p id="yourScore"></p>
-<p>Best Score: <span id="bestScore2">0</span></p>
-<button class="restartBtn" onclick="restartGame()">Restart</button>
+    <h2>Game Over</h2>
+    <img src="Modi.jpg" class="modiImg" style="width:130px; border-radius:25px; margin:10px 5px;">
+    <p class="premiumText">TENSION MAT LE <br>ISKA KARAN MODI HAI</p>
+    <p id="yourScore"></p>
+    <p>Best Score: <span id="bestScore2">0</span></p>
+    <button class="restartBtn" onclick="restartGame()">Restart</button>
 </div>
 
 <!-- Pause Overlay -->
 <button id="pauseBtn" onclick="togglePause()" style="display:none;">Pause</button>
 <div id="pauseOverlay">
-<h1>PAUSED</h1>
-<button onclick="togglePause()">Resume</button>
+    <h1>PAUSED</h1>
+    <button onclick="togglePause()">Resume</button>
 </div>
 
 <script>
 // Canvas setup
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
 // Game variables
 let score = 0, gameRunning = false, paused = false, level = 1;
@@ -122,47 +231,75 @@ let bestScore = localStorage.getItem("bestScore")||0;
 document.getElementById("bestScore").innerText = bestScore;
 document.getElementById("bestScore2").innerText = bestScore;
 
-// Audio placeholders
-let jumpSound = new Audio(); let scoreSound = new Audio(); let gameOverSound = new Audio(); let bgMusic = new Audio();
-bgMusic.loop = true; bgMusic.volume=0.3;
+// Sounds
+let jumpSound = new Audio("jump.mp3");
+let scoreSound = new Audio("score.mp3");
+let gameOverSound = new Audio("gameover.mp3");
+let bgMusic = new Audio("bgMusic.mp3");
+bgMusic.loop = true; bgMusic.volume = 0.3;
 
 // Bird
-const faces = ["face1.png","face2.png"];
-let currentFaceIndex = 0;
-const selectedFace = document.getElementById("selectedFace");
-let birdImg = new Image(); birdImg.src = faces[currentFaceIndex];
-let bird = {x:canvas.width*0.2, y:canvas.height/2, width:60, height:60, gravity:0.4, lift:-8, velocity:0};
+let birdImg = new Image(); birdImg.src = "face1.png";
+let bird = {x: canvas.width*0.2, y: canvas.height/2, width: 60, height: 60, gravity: 0.4, lift: -8, velocity: 0, rotation: 0};
 
 // Pipes
-let pipes=[], pipeSpeed=2.5, pipeGap=canvas.height*0.35;
+let pipes = [], pipeSpeed = 2.5, pipeGap = canvas.height*0.35;
 
 // Clouds
-let clouds=[];
-for(let i=0;i<5;i++){ clouds.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height*0.4, speed:0.2+Math.random()*0.5}) }
+let clouds = [];
+for(let i=0;i<5;i++){
+    clouds.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height*0.4, speed:0.2+Math.random()*0.5});
+}
 
 // Particles
-let particles=[];
-function createJumpParticles(){
+let particles = [];
+function createJumpParticles() {
     for(let i=0;i<5;i++){
-        particles.push({x: bird.x+30, y: bird.y+30, size: Math.random()*5+2, velocityX: Math.random()*2-1, velocityY: Math.random()*-2-1, alpha:1});
+        particles.push({
+            x: bird.x+30, y: bird.y+30,
+            size: Math.random()*5+2,
+            velocityX: Math.random()*2-1,
+            velocityY: Math.random()*-2-1,
+            alpha: 1
+        });
     }
 }
-function drawParticles(){
+function drawParticles() {
     particles.forEach((p,i)=>{
         ctx.fillStyle = `rgba(255,255,0,${p.alpha})`;
-        ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,2*Math.PI); ctx.fill();
-        p.x += p.velocityX; p.y += p.velocityY; p.alpha-=0.03;
-        if(p.alpha<=0) particles.splice(i,1);
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.size,0,2*Math.PI);
+        ctx.fill();
+        p.x += p.velocityX;
+        p.y += p.velocityY;
+        p.alpha -= 0.03;
+        if(p.alpha <=0) particles.splice(i,1);
     });
 }
 
-// Face selection
-function changeFace(dir){
-    currentFaceIndex += dir;
-    if(currentFaceIndex<0) currentFaceIndex=faces.length-1;
-    if(currentFaceIndex>=faces.length) currentFaceIndex=0;
-    selectedFace.src=faces[currentFaceIndex];
-    birdImg.src=faces[currentFaceIndex];
+// Pipe gradients
+const pipeColors = [["#145A32","#27ae60","#2ecc71","#145A32"],["#8e44ad","#9b59b6","#d2b4de","#8e44ad"],["#e67e22","#f39c12","#f1c40f","#e67e22"]];
+function getPipeGradient(pipe){
+    let colorIndex = Math.floor(score/20)%pipeColors.length;
+    let colors = pipeColors[colorIndex];
+    let grad = ctx.createLinearGradient(pipe.x,0,pipe.x+pipe.width,0);
+    grad.addColorStop(0, colors[0]);
+    grad.addColorStop(0.3, colors[1]);
+    grad.addColorStop(0.6, colors[2]);
+    grad.addColorStop(1, colors[3]);
+    return grad;
+}
+
+// Face carousel
+const faces = ["face1.png","face2.png"];
+let currentFaceIndex = 0;
+const selectedFace = document.getElementById("selectedFace");
+function changeFace(direction){
+    currentFaceIndex += direction;
+    if(currentFaceIndex < 0) currentFaceIndex = faces.length-1;
+    if(currentFaceIndex >= faces.length) currentFaceIndex = 0;
+    selectedFace.src = faces[currentFaceIndex];
+    birdImg.src = faces[currentFaceIndex];
 }
 
 // Create Pipe
@@ -171,68 +308,178 @@ function createPipe(){
     pipes.push({x:canvas.width, top:topHeight, bottom:topHeight+pipeGap, width:canvas.width*0.12, passed:false});
 }
 
-// Draw functions
-function drawBird(){ ctx.drawImage(birdImg,bird.x,bird.y,bird.width,bird.height);}
-function updateBird(dt){ if(!paused){ bird.velocity+=bird.gravity*(dt/16); bird.y+=bird.velocity*(dt/16);
-if(bird.y+bird.height>=canvas.height){bird.y=canvas.height-bird.height; gameOver();}
-if(bird.y<=0){bird.y=0; bird.velocity=0;} } }
+// Draw Bird
+function drawBird(){
+    ctx.save();
+    ctx.translate(bird.x+bird.width/2,bird.y+bird.height/2);
+    ctx.rotate(bird.velocity*0.05);
+    ctx.drawImage(birdImg,-bird.width/2,-bird.height/2,bird.width,bird.height);
+    ctx.restore();
+}
+
+// Update Bird
+function updateBird(dt){
+    if(!paused){
+        bird.velocity += bird.gravity*(dt/16);
+        bird.y += bird.velocity*(dt/16);
+        if(bird.y+bird.height >= canvas.height){ bird.y = canvas.height-bird.height; gameOver(); }
+        if(bird.y <= 0){ bird.y=0; bird.velocity=0; }
+    }
+}
+
+// Draw Pipes
 function drawPipes(dt){
     pipes.forEach(pipe=>{
-        if(!paused) pipe.x-=pipeSpeed*(dt/16);
-        ctx.fillStyle="#27ae60"; ctx.fillRect(pipe.x,0,pipe.width,pipe.top);
+        if(!paused) pipe.x -= pipeSpeed*(dt/16);
+        ctx.fillStyle = getPipeGradient(pipe);
+        ctx.fillRect(pipe.x,0,pipe.width,pipe.top);
         ctx.fillRect(pipe.x,pipe.bottom,pipe.width,canvas.height);
-        if(!pipe.passed && pipe.x + pipe.width < bird.x && !paused){
-            score++; pipe.passed=true;
-            if(score%10===0){ level++; pipeSpeed+=0.5; pipeGap-=10; if(pipeGap<80)pipeGap=80; }
+
+        // Pipe caps
+        ctx.fillStyle = "#2ecc71";
+        ctx.fillRect(pipe.x-10, pipe.top-20, pipe.width+20, 20);
+        ctx.fillRect(pipe.x-10, pipe.bottom, pipe.width+20, 20);
+
+        // Score & Level
+        if(!pipe.passed && pipe.x+pipe.width < bird.x && !paused){
+            score++; pipe.passed=true; scoreSound.currentTime=0; scoreSound.play();
+            if(score%10===0){
+                level++; pipeSpeed+=0.5; pipeGap-=10; if(pipeGap<80) pipeGap=80;
+                showLevel = true; levelAlpha=1;
+                setTimeout(()=>{
+                    let fadeInterval = setInterval(()=>{
+                        levelAlpha -= 0.05;
+                        if(levelAlpha<=0){ levelAlpha=0; showLevel=false; clearInterval(fadeInterval);}
+                    },50);
+                },500);
+            }
             createPipe();
         }
-        if(bird.x<pipe.x+pipe.width && bird.x+bird.width>pipe.x && (bird.y<pipe.top || bird.y+bird.height>pipe.bottom)) gameOver();
+
+        // Collision
+        if(bird.x < pipe.x + pipe.width && bird.x + bird.width > pipe.x &&
+           (bird.y < pipe.top || bird.y + bird.height > pipe.bottom)) gameOver();
     });
-    pipes = pipes.filter(p=>p.x+p.width>0);
+    pipes = pipes.filter(p => p.x+ p.width > 0);
     if(pipes.length===0) createPipe();
 }
-function drawClouds(dt){ clouds.forEach(c=>{ c.x-=c.speed*(dt/16); if(c.x<-200)c.x=canvas.width; ctx.fillStyle="rgba(255,255,255,0.6)"; ctx.beginPath(); ctx.ellipse(c.x,c.y,80,40,0,0,2*Math.PI); ctx.fill();}); }
-function drawScore(){ ctx.fillStyle="black"; ctx.font=`${Math.floor(canvas.width*0.07)}px Arial`; ctx.fillText("Score: "+score,10,canvas.height*0.07); ctx.fillText("Best: "+bestScore,10,canvas.height*0.14); }
 
-// Sky
-function updateSky(){ let cycle=Date.now()*0.002; let r=Math.floor(120+Math.sin(cycle)*80); let g=Math.floor(180+Math.sin(cycle)*50); let b=255; document.body.style.background=`rgb(${r},${g},${b})`; }
+// Draw Clouds
+function drawClouds(dt){
+    clouds.forEach(c=>{
+        c.x -= c.speed*(dt/16);
+        if(c.x<-200) c.x=canvas.width;
+        ctx.fillStyle="rgba(255,255,255,0.6)";
+        ctx.beginPath();
+        ctx.ellipse(c.x,c.y,80,40,0,0,2*Math.PI);
+        ctx.fill();
+    });
+}
 
-// Game over
+// Draw Score
+function drawScore(){
+    if(score>bestScore){ bestScore=score; localStorage.setItem("bestScore",bestScore); }
+    ctx.fillStyle="black";
+    ctx.font=`${Math.floor(canvas.width*0.07)}px Arial`;
+    ctx.fillText("Score: "+score,10,canvas.height*0.07);
+    ctx.fillText("Best: "+bestScore,10,canvas.height*0.14);
+}
+
+// Display Level
+let showLevel=false, levelAlpha=1;
+function displayLevel(){
+    if(!showLevel) return;
+    ctx.save();
+    ctx.globalAlpha = levelAlpha;
+    ctx.fillStyle="gold";
+    ctx.font=`bold ${Math.floor(canvas.width*0.08)}px Arial`;
+    ctx.textAlign="center";
+    ctx.fillText("LEVEL UP!", canvas.width/2, canvas.height/2-30);
+    ctx.fillStyle="white";
+    ctx.font=`bold ${Math.floor(canvas.width*0.05)}px Arial`;
+    ctx.fillText("LEVEL "+level, canvas.width/2, canvas.height/2+30);
+    ctx.restore();
+}
+
+// Sky update
+function updateSky(){
+    let cycle = Date.now()*0.002;
+    let r = Math.floor(120+Math.sin(cycle)*80);
+    let g = Math.floor(180+Math.sin(cycle)*50);
+    let b = 255;
+    document.body.style.background = `rgb(${r},${g},${b})`;
+}
+
+// Game Over
 function gameOver(){
     gameRunning=false; paused=false;
     document.getElementById("bestScore").innerText=bestScore;
     document.getElementById("bestScore2").innerText=bestScore;
     document.getElementById("gameOver").style.display="block";
     document.getElementById("yourScore").innerText="Your Score: "+score;
+    gameOverSound.currentTime=0; gameOverSound.play();
     bgMusic.pause();
 }
 
 // Start & Restart
-function startGame(){ document.getElementById("startScreen").style.display="none"; gameRunning=true; paused=false; pipes=[]; score=0; level=1; requestAnimationFrame(gameLoop); bgMusic.play();}
-function restartGame(){ score=0; level=1; bird.y=canvas.height/2; bird.velocity=0; pipes=[]; pipeSpeed=2.5; pipeGap=canvas.height*0.35; gameRunning=false; paused=false; document.getElementById("gameOver").style.display="none"; document.getElementById("startScreen").style.display="block"; document.getElementById("pauseBtn").style.display="none"; }
+function startGame(){
+    document.getElementById("startScreen").style.display="none";
+    gameRunning=true; paused=false; lastTime=null; level=1;
+    requestAnimationFrame(gameLoop);
+    bgMusic.play();
+}
+function restartGame(){
+    score=0; level=1; bird.y=canvas.height/2; bird.velocity=0; pipes=[]; pipeSpeed=2.5; pipeGap=canvas.height*0.35;
+    gameRunning=false; paused=false;
+    document.getElementById("gameOver").style.display="none";
+    document.getElementById("startScreen").style.display="block";
+    document.getElementById("pauseBtn").style.display="none";
+}
 
 // Pause
-const pauseBtn=document.getElementById("pauseBtn");
-const pauseOverlay=document.getElementById("pauseOverlay");
-function togglePause(){ if(!gameRunning) return; paused=!paused; if(paused){ bgMusic.pause(); pauseOverlay.style.display="block"; pauseBtn.style.display="none"; } else { bgMusic.play(); pauseOverlay.style.display="none"; pauseBtn.style.display="block"; } }
+const pauseBtn = document.getElementById("pauseBtn");
+const pauseOverlay = document.getElementById("pauseOverlay");
+function togglePause(){
+    if(!gameRunning) return;
+    paused = !paused;
+    if(paused){ bgMusic.pause(); pauseOverlay.style.display="block"; pauseBtn.style.display="none"; }
+    else { bgMusic.play(); pauseOverlay.style.display="none"; pauseBtn.style.display="block"; }
+}
 
-// Controls (desktop + mobile)
+// Touch & Mouse Jump
 canvas.addEventListener("touchstart", jump);
 canvas.addEventListener("mousedown", jump);
-function jump(){ if(!gameRunning||paused) return; bird.velocity=bird.lift; createJumpParticles(); }
+function jump(){
+    if(!gameRunning || paused) return;
+    bird.velocity = bird.lift;
+    jumpSound.currentTime = 0;
+    jumpSound.play();
+    createJumpParticles();
+}
 
-// Game loop
+// Game Loop
 let lastTime=null;
 function gameLoop(timestamp){
     if(!lastTime) lastTime=timestamp;
-    const dt=timestamp-lastTime; lastTime=timestamp;
+    const dt = timestamp-lastTime; lastTime=timestamp;
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    updateSky(); drawClouds(dt); drawParticles();
-    if(gameRunning){ pauseBtn.style.display="block"; drawBird(); drawPipes(dt); drawScore(); if(!paused) updateBird(dt); }
-    else pauseBtn.style.display="none";
+    updateSky();
+    drawClouds(dt);
+    drawParticles();
+    if(gameRunning){
+        pauseBtn.style.display="block";
+        drawBird();
+        drawPipes(dt);
+        drawScore();
+        displayLevel();
+        if(!paused) updateBird(dt);
+    } else {
+        pauseBtn.style.display="none";
+    }
     requestAnimationFrame(gameLoop);
 }
 requestAnimationFrame(gameLoop);
+
 </script>
 </body>
 </html>
