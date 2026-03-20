@@ -536,21 +536,29 @@
       }
     }
 
-    // Touch controls
-    canvas.addEventListener("touchstart", () => {
-      if (!gameRunning || paused) return;
-      bird.velocity = bird.lift;
-      jumpSound.currentTime = 0;
-      jumpSound.play();
-      createJumpParticles();
-    });
+   // Touch controls (mobile)
+canvas.addEventListener("touchstart", () => {
+  if (!gameRunning || paused) return;
+  bird.velocity = bird.lift;
+  jumpSound.currentTime = 0;
+  jumpSound.play();
+  createJumpParticles();
+});
 
-    //Computer Space Control
-    document.addEventListener("keydown", (e) => {
+// Mouse click (computer)
+canvas.addEventListener("click", () => {
+  if (!gameRunning || paused) return;
+  bird.velocity = bird.lift;
+  jumpSound.currentTime = 0;
+  jumpSound.play();
+  createJumpParticles();
+});
+
+// Keyboard (space key)
+document.addEventListener("keydown", (e) => {
   if (!gameRunning || paused) return;
 
-  // Space key ya Arrow Up
-  if (e.code === "Space" || e.code === "ArrowUp") {
+  if (e.code === "Space") {
     bird.velocity = bird.lift;
     jumpSound.currentTime = 0;
     jumpSound.play();
