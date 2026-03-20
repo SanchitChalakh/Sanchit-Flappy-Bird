@@ -271,7 +271,20 @@
     };
 
     // Pipes
-    let pipes = [], pipeSpeed = 2.5, pipeGap = canvas.height * 0.35;
+ // Pipes
+let pipeWidth = Math.min(canvas.width * 0.12, 80); // max 80px
+let pipeGap = Math.min(canvas.height * 0.35, 200); // max 200px
+let pipes = [];
+let pipeSpeed = 2.5;
+
+// Don't push a pipe here! Pipes are added by createPipe()
+
+pipes.push({
+  width: pipeWidth,
+  top: topHeight,
+  bottom: topHeight + pipeGap,
+  passed: false
+});
 
     // Clouds
     let clouds = [];
@@ -343,16 +356,16 @@
     }
 
     // Create pipe
-    function createPipe() {
-      let topHeight = Math.random() * canvas.height * 0.45 + 50;
-      pipes.push({
-        x: canvas.width,
-        top: topHeight,
-        bottom: topHeight + pipeGap,
-        width: canvas.width * 0.12,
-        passed: false
-      });
-    }
+   function createPipe() {
+  let topHeight = Math.random() * canvas.height * 0.45 + 50;
+  pipes.push({
+    x: canvas.width,
+    top: topHeight,
+    bottom: topHeight + pipeGap,
+    width: pipeWidth,
+    passed: false
+  });
+}
 
     // Game loop & drawing functions
     let lastTime = null;
@@ -537,13 +550,14 @@
     }
 
    // Touch controls (mobile)
-canvas.addEventListener("touchstart", () => {
+canvas.addEventListener("touchstart", (e) => {
+  e.preventDefault(); // prevent click double trigger
   if (!gameRunning || paused) return;
   bird.velocity = bird.lift;
   jumpSound.currentTime = 0;
   jumpSound.play();
   createJumpParticles();
-});
+}, { passive: false });
 
 // Mouse click (computer)
 canvas.addEventListener("click", () => {
